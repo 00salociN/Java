@@ -1,6 +1,6 @@
 create database bd_controle_pets;
 
-use bd_controle pets;
+use bd_controle_pets;
 
 create table pets (
 id int auto_increment primary key,
