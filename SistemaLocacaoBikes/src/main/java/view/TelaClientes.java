@@ -7,6 +7,8 @@ package view;
 import model.Cliente;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import dao.ClienteDAO;
+import javax.swing.JOptionPane;
 
 
 
@@ -24,6 +26,29 @@ public class TelaClientes extends javax.swing.JFrame {
     public TelaClientes() {
         initComponents();
     }
+    
+    public void readJTable() {
+    // Recupera o modelo da tabela
+    DefaultTableModel modelo = (DefaultTableModel) tabelaClientes.getModel();
+    
+    // Limpa a tabela para evitar duplicidade de dados
+    modelo.setNumRows(0);
+    
+    // Cria a instância de PetDAO
+    ClienteDAO cdao = new ClienteDAO();
+    
+    // Percorre os pets retornados pelo PetDAO
+    for (Cliente c : cdao.read()) {
+        // Adiciona cada pet na tabela
+        modelo.addRow(new Object[]{
+            c.getId(),
+            c.getCpf(),
+            c.getNome(),
+            c.getEmail(),
+            c.getTelefone()
+        });
+    }
+}
     
     public void listarClientes() {
     List<model.Cliente> lista = new dao.ClienteDAO().read();
@@ -122,6 +147,11 @@ public class TelaClientes extends javax.swing.JFrame {
         btnSalvar.setText("Salvar");
 
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnExcluir.setText("Excluir");
 
@@ -220,11 +250,18 @@ public class TelaClientes extends javax.swing.JFrame {
                 .addContainerGap(351, Short.MAX_VALUE))
         );
 
-        txtNome.getAccessibleContext().setAccessibleParent(null);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void limparCampos() {
+    txtNome.setText("");
+    txtCPF.setText("");
+    txtID.setText("");
+    txtTelefone.setText("");
+    txtEmail.setText("");
+    txtNome.requestFocus();
+}
+    
     private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNomeActionPerformed
@@ -243,6 +280,24 @@ listarClientes();        // TODO add your handling code here:
     private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
     listarClientes(); 
     }//GEN-LAST:event_btnListarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+    if (tabelaClientes.getSelectedRow() != -1) {
+        Cliente c = new Cliente();
+        ClienteDAO dao = new ClienteDAO();
+        c.setId(Integer.parseInt(txtID.getText()));
+        c.setNome(txtNome.getText());
+        c.setCpf(txtCpf.getText());
+        c.setEmail(txtEmail.getText());
+        c.setTelefone(txtTelefone.getText());
+        dao.update(c);
+        limparCampos();
+        readJTable();
+    }
+    else {
+        JOptionPane.showMessageDialog(null, "Selecione um pet para excluir.");
+    }
+    }//GEN-LAST:event_btnEditarActionPerformed
 
     /**
      * @param args the command line arguments
