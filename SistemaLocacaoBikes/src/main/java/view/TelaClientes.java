@@ -27,28 +27,6 @@ public class TelaClientes extends javax.swing.JFrame {
         initComponents();
     }
     
-    public void readJTable() {
-    // Recupera o modelo da tabela
-    DefaultTableModel modelo = (DefaultTableModel) tabelaClientes.getModel();
-    
-    // Limpa a tabela para evitar duplicidade de dados
-    modelo.setNumRows(0);
-    
-    // Cria a instância de PetDAO
-    ClienteDAO cdao = new ClienteDAO();
-    
-    // Percorre os pets retornados pelo PetDAO
-    for (Cliente c : cdao.read()) {
-        // Adiciona cada pet na tabela
-        modelo.addRow(new Object[]{
-            c.getId(),
-            c.getCpf(),
-            c.getNome(),
-            c.getEmail(),
-            c.getTelefone()
-        });
-    }
-}
     
     public void listarClientes() {
     List<model.Cliente> lista = new dao.ClienteDAO().read();
@@ -129,6 +107,11 @@ public class TelaClientes extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tabelaClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelaClientesMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabelaClientes);
 
         txtNome.addActionListener(new java.awt.event.ActionListener() {
@@ -145,6 +128,11 @@ public class TelaClientes extends javax.swing.JFrame {
         });
 
         btnSalvar.setText("Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         btnEditar.setText("Editar");
         btnEditar.addActionListener(new java.awt.event.ActionListener() {
@@ -154,6 +142,11 @@ public class TelaClientes extends javax.swing.JFrame {
         });
 
         btnExcluir.setText("Excluir");
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
+            }
+        });
 
         btnListar.setText("Listar");
         btnListar.addActionListener(new java.awt.event.ActionListener() {
@@ -255,26 +248,21 @@ public class TelaClientes extends javax.swing.JFrame {
 
     private void limparCampos() {
     txtNome.setText("");
-    txtCPF.setText("");
+    txtCpf.setText("");
     txtID.setText("");
     txtTelefone.setText("");
     txtEmail.setText("");
-    txtNome.requestFocus();
+    txtNome.requestFocusInWindow();
 }
+   
     
     private void txtNomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNomeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNomeActionPerformed
 
     private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
-model.Cliente c = new model.Cliente();
-c.setNome(txtNome.getText());
-c.setCpf(txtCpf.getText());
-c.setTelefone(txtTelefone.getText());
-c.setEmail(txtEmail.getText());
-dao.ClienteDAO dao = new dao.ClienteDAO();
-dao.create(c);
-listarClientes();        // TODO add your handling code here:
+    limparCampos();
+
     }//GEN-LAST:event_btnNovoActionPerformed
 
     private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
@@ -292,12 +280,54 @@ listarClientes();        // TODO add your handling code here:
         c.setTelefone(txtTelefone.getText());
         dao.update(c);
         limparCampos();
-        readJTable();
+        listarClientes();
     }
     else {
-        JOptionPane.showMessageDialog(null, "Selecione um pet para excluir.");
+        JOptionPane.showMessageDialog(null, "Selecione um pet para Editar.");
     }
     }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+    if (tabelaClientes.getSelectedRow() != -1) {
+        Cliente c = new Cliente();
+        ClienteDAO dao = new ClienteDAO();
+        c.setId(Integer.parseInt(txtID.getText()));
+        dao.delete(c);
+        limparCampos();
+        listarClientes();
+    } else {
+        JOptionPane.showMessageDialog(null, "Selecione um cliente para Excluir.");
+    }
+    }//GEN-LAST:event_btnExcluirActionPerformed
+
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        if (txtNome.getText().isEmpty() || txtCpf.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Nome e CPF obrigatórios");
+        return;
+    }
+    Cliente c = new Cliente();
+    ClienteDAO dao = new ClienteDAO();
+    c.setCpf(txtCpf.getText());
+    c.setNome(txtNome.getText()); // txtNomePet -> jTextField2
+    c.setTelefone(txtTelefone.getText()); // txtNomeTutor -> jTextField4
+    c.setEmail(txtEmail.getText());
+    dao.create(c);
+    limparCampos();
+    listarClientes();
+
+    }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void tabelaClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaClientesMouseClicked
+        // TODO add your handling code here:
+        if (tabelaClientes.getSelectedRow() != -1) {
+        txtID.setText(tabelaClientes.getValueAt(tabelaClientes.getSelectedRow(), 0).toString());
+        txtNome.setText(tabelaClientes.getValueAt(tabelaClientes.getSelectedRow(), 1).toString());
+        txtCpf.setText(tabelaClientes.getValueAt(tabelaClientes.getSelectedRow(), 2).toString());
+        txtTelefone.setText(tabelaClientes.getValueAt(tabelaClientes.getSelectedRow(), 3).toString());
+        txtEmail.setText(tabelaClientes.getValueAt(tabelaClientes.getSelectedRow(), 4).toString());
+
+    }
+    }//GEN-LAST:event_tabelaClientesMouseClicked
 
     /**
      * @param args the command line arguments

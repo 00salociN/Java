@@ -8,6 +8,8 @@ import model.Bicicleta;
 import dao.BicicletaDAO;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import javax.swing.JOptionPane;
+
 
 /**
  *
@@ -33,6 +35,12 @@ for (Bicicleta b : lista) {
 modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
 }
 }
+    
+        private void limparCampos() {
+    txtCodigo.setText("");
+    cbStatus.setSelectedIndex(-1);
+    txtCodigo.requestFocusInWindow();
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -52,6 +60,7 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
         btnListar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaBicicletas = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,6 +73,11 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
         });
 
         btnNovo.setText("Novo");
+        btnNovo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNovoActionPerformed(evt);
+            }
+        });
 
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
@@ -73,23 +87,55 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
         });
 
         btnEditar.setText("Editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnExcluir.setText("Excluir");
 
         btnListar.setText("Listar");
+        btnListar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListarActionPerformed(evt);
+            }
+        });
 
         tabelaBicicletas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ID", "Codigo", "Status"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tabelaBicicletas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelaBicicletasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabelaBicicletas);
+
+        jLabel1.setText("Código");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -99,8 +145,8 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(36, 36, 36)
-                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
                         .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(46, 46, 46)
@@ -112,7 +158,10 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
                         .addGap(18, 18, 18)
                         .addComponent(btnExcluir)
                         .addGap(18, 18, 18)
-                        .addComponent(btnListar)))
+                        .addComponent(btnListar))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addComponent(jLabel1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -120,11 +169,13 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(96, 96, 96)
+                .addGap(68, 68, 68)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNovo)
                     .addComponent(btnSalvar)
@@ -135,7 +186,7 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -154,6 +205,46 @@ dao.create(b);
 listarBicicletas();
 
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
+        // TODO add your handling code here:
+ List<Bicicleta> lista = new BicicletaDAO().read();
+ DefaultTableModel modelo = (DefaultTableModel)
+ tabelaBicicletas.getModel();
+ modelo.setRowCount(0);
+ for (Bicicleta b : lista) {
+ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
+ }
+    }//GEN-LAST:event_btnListarActionPerformed
+
+    private void tabelaBicicletasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaBicicletasMouseClicked
+        // TODO add your handling code here:
+        if (tabelaBicicletas.getSelectedRow() != -1) {
+        txtCodigo.setText(tabelaBicicletas.getValueAt(tabelaBicicletas.getSelectedRow(), 1).toString());
+        cbStatus.setSelectedItem(tabelaBicicletas.getValueAt(tabelaBicicletas.getSelectedRow(), 2).toString());
+    }
+    }//GEN-LAST:event_tabelaBicicletasMouseClicked
+
+    private void btnNovoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNovoActionPerformed
+        // TODO add your handling code here:
+        limparCampos();
+    }//GEN-LAST:event_btnNovoActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        // TODO add your handling code here:
+            if (tabelaBicicletas.getSelectedRow() != -1) {
+        Bicicleta b = new Bicicleta();
+        BicicletaDAO dao = new BicicletaDAO();
+        b.setCodigo(txtCodigo.getText());
+        b.setStatus(cbStatus.getSelectedItem().toString());
+        dao.update(b);
+        limparCampos();
+        listarBicicletas();
+    }
+    else {
+        JOptionPane.showMessageDialog(null, "Selecione um pet para Editar.");
+    }
+    }//GEN-LAST:event_btnEditarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -187,6 +278,7 @@ listarBicicletas();
     private javax.swing.JButton btnNovo;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JComboBox<String> cbStatus;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabelaBicicletas;
     private javax.swing.JTextField txtCodigo;
