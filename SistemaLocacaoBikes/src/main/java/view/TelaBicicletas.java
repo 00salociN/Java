@@ -94,6 +94,11 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
         });
 
         btnExcluir.setText("Excluir");
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
+            }
+        });
 
         btnListar.setText("Listar");
         btnListar.addActionListener(new java.awt.event.ActionListener() {
@@ -144,11 +149,6 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27)
-                        .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(46, 46, 46)
                         .addComponent(btnNovo)
                         .addGap(18, 18, 18)
@@ -160,8 +160,13 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
                         .addGap(18, 18, 18)
                         .addComponent(btnListar))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(68, 68, 68)
-                        .addComponent(jLabel1)))
+                        .addGap(83, 83, 83)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(49, 49, 49)
+                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
@@ -169,13 +174,13 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(68, 68, 68)
+                .addGap(131, 131, 131)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
+                    .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNovo)
                     .addComponent(btnSalvar)
@@ -186,7 +191,7 @@ modelo.addRow(new Object[]{b.getId(), b.getCodigo(), b.getStatus()});
             .addGroup(layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         pack();
@@ -232,19 +237,37 @@ listarBicicletas();
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
         // TODO add your handling code here:
-            if (tabelaBicicletas.getSelectedRow() != -1) {
+    int linhaSelecionada = tabelaBicicletas.getSelectedRow();  // pega a linha selecionada
+    if (linhaSelecionada != -1) {
         Bicicleta b = new Bicicleta();
         BicicletaDAO dao = new BicicletaDAO();
+        int id = (int) tabelaBicicletas.getValueAt(linhaSelecionada, 0); // pega o id da linha selecionada
+        b.setId(id);
         b.setCodigo(txtCodigo.getText());
         b.setStatus(cbStatus.getSelectedItem().toString());
         dao.update(b);
         limparCampos();
         listarBicicletas();
-    }
-    else {
-        JOptionPane.showMessageDialog(null, "Selecione um pet para Editar.");
+    } else {
+        JOptionPane.showMessageDialog(null, "Selecione uma bicicleta para editar.");
     }
     }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        // TODO add your handling code here:
+        int linhaSelecionada = tabelaBicicletas.getSelectedRow();
+        if (tabelaBicicletas.getSelectedRow() != -1) {
+        Bicicleta b = new Bicicleta();
+        BicicletaDAO dao = new BicicletaDAO();
+        int id = (int) tabelaBicicletas.getValueAt(linhaSelecionada, 0); // pega o id da linha selecionada
+        b.setId(id);
+        dao.delete(b);
+        limparCampos();
+        listarBicicletas();
+    } else {
+        JOptionPane.showMessageDialog(null, "Selecione um cliente para Excluir.");
+    }
+    }//GEN-LAST:event_btnExcluirActionPerformed
 
     /**
      * @param args the command line arguments
