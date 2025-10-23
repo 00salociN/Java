@@ -4,6 +4,16 @@
  */
 package view;
 
+import model.Manutencao;
+import dao.ManutencaoDAO;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
+
 /**
  *
  * @author cleri
@@ -18,7 +28,16 @@ public class TelaManutencao extends javax.swing.JFrame {
     public TelaManutencao() {
         initComponents();
     }
-
+    
+    public void ListarManutencao(){
+        List<Manutencao> lista = new ManutencaoDAO() .read();
+       DefaultTableModel modelo = (DefaultTableModel)
+        tabelaManutencao.getModel();
+        modelo.setRowCount(0);
+        for (Manutencao m : lista) {
+        modelo.addRow(new Object[]{m.getId(), m.getDescricao(), m.getData()});
+}
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -46,6 +65,11 @@ public class TelaManutencao extends javax.swing.JFrame {
         jScrollPane1.setViewportView(txtDescricao);
 
         btnRegistar.setText("Registrar");
+        btnRegistar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistarActionPerformed(evt);
+            }
+        });
 
         btnListar.setText("Listar");
 
@@ -107,6 +131,31 @@ public class TelaManutencao extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnRegistarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistarActionPerformed
+  try {
+        Manutencao m = new Manutencao();
+        m.setDescricao(txtDescricao.getText());
+
+        // Converte a data digitada (String) em um objeto java.util.Date
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // mesmo formato do campo
+        Date data = sdf.parse(txtData.getText());
+        m.setData(data);
+
+        ManutencaoDAO dao = new ManutencaoDAO();
+        dao.create(m);
+
+        ListarManutencao();
+
+        JOptionPane.showMessageDialog(null, "Manutenção registrada com sucesso!");
+
+    } catch (ParseException e) {
+        JOptionPane.showMessageDialog(null, "Data inválida! Use o formato dd/MM/yyyy.");
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Erro ao registrar manutenção: " + e.getMessage());
+        e.printStackTrace();
+    }
+    }//GEN-LAST:event_btnRegistarActionPerformed
 
     /**
      * @param args the command line arguments
