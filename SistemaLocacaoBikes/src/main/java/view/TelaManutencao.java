@@ -72,6 +72,11 @@ public class TelaManutencao extends javax.swing.JFrame {
         });
 
         btnListar.setText("Listar");
+        btnListar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListarActionPerformed(evt);
+            }
+        });
 
         tabelaManutencao.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -156,6 +161,11 @@ public class TelaManutencao extends javax.swing.JFrame {
         e.printStackTrace();
     }
     }//GEN-LAST:event_btnRegistarActionPerformed
+
+    private void btnListarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListarActionPerformed
+        // TODO add your handling code here:
+        ListarManutencao();
+    }//GEN-LAST:event_btnListarActionPerformed
 
     /**
      * @param args the command line arguments
