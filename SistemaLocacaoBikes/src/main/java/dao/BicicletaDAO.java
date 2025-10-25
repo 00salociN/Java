@@ -65,4 +65,23 @@ stmt.executeUpdate();
 e.printStackTrace();
 }
 }
+public Bicicleta findById(int id) {
+    String sql = "SELECT * FROM bicicleta WHERE id = ?";
+    try (Connection con = ConnectionFactory.getConnection();
+         PreparedStatement stmt = con.prepareStatement(sql)) {
+        stmt.setInt(1, id);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                Bicicleta b = new Bicicleta();
+                b.setId(rs.getInt("id"));
+                b.setCodigo(rs.getString("codigo"));
+                b.setStatus(rs.getString("status"));
+                return b;
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
 }

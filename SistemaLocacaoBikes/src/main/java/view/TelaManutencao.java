@@ -4,6 +4,7 @@
  */
 package view;
 
+import model.Bicicleta;
 import model.Manutencao;
 import dao.ManutencaoDAO;
 import java.util.List;
@@ -12,6 +13,10 @@ import java.util.Date;
 import javax.swing.JOptionPane;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import javax.swing.DefaultComboBoxModel;
+import dao.BicicletaDAO;
+
 
 
 /**
@@ -25,18 +30,55 @@ public class TelaManutencao extends javax.swing.JFrame {
     /**
      * Creates new form TelaManutencao
      */
+    
+    private void preencherComboBicicletas() {
+    try {
+        bicicletas.clear();
+        List<Bicicleta> lista = new BicicletaDAO().read();
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        for (Bicicleta b : lista) {
+            bicicletas.add(b);                   // guarda o objeto para uso futuro
+            model.addElement(b.getCodigo());     // mostra o código (ou outro campo)
+        }
+        cbBicicletas.setModel(model);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Erro ao carregar bicicletas: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
     public TelaManutencao() {
         initComponents();
+        preencherComboBicicletas();
     }
     
+    private List<Bicicleta> bicicletas = new ArrayList<>();
+    
     public void ListarManutencao(){
-        List<Manutencao> lista = new ManutencaoDAO() .read();
-       DefaultTableModel modelo = (DefaultTableModel)
-        tabelaManutencao.getModel();
-        modelo.setRowCount(0);
-        for (Manutencao m : lista) {
-        modelo.addRow(new Object[]{m.getId(), m.getDescricao(), m.getData()});
-}
+        List<Manutencao> lista = new ManutencaoDAO().read();
+    DefaultTableModel modelo = (DefaultTableModel) tabelaManutencao.getModel();
+
+    // Define cabeçalhos (opcional — se você já configurou no NetBeans ignore essa linha)
+    modelo.setColumnIdentifiers(new Object[] {"ID", "Bicicleta", "Data", "Descrição"});
+
+    modelo.setRowCount(0);
+    BicicletaDAO bdao = new BicicletaDAO();
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+    for (Manutencao m : lista) {
+        String codigoBicicleta = "";
+        try {
+            // tenta buscar a bicicleta pelo id para obter o código/nome
+            model.Bicicleta b = bdao.findById(m.getBicicletaId()); // ajuste o pacote/nome se necessário
+            if (b != null) {
+                codigoBicicleta = b.getCodigo(); // ou b.getNome()
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String dataStr = m.getData() != null ? sdf.format(m.getData()) : "";
+        modelo.addRow(new Object[]{ m.getId(), codigoBicicleta, dataStr, m.getDescricao() });
+    }
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -55,6 +97,9 @@ public class TelaManutencao extends javax.swing.JFrame {
         btnListar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaManutencao = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,10 +131,36 @@ public class TelaManutencao extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ID", "Bicicleta", "Data", "Descrição"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tabelaManutencao.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabelaManutencaoMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tabelaManutencao);
+
+        jLabel1.setText("Data");
+
+        jLabel2.setText("Bicicletas");
+
+        jLabel3.setText("Descricao");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -97,32 +168,48 @@ public class TelaManutencao extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGap(55, 55, 55)
+                            .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(31, 31, 31)
+                            .addComponent(cbBicicletas, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(31, 31, 31)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(btnRegistar)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnListar))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(82, 82, 82)
+                            .addComponent(jLabel1)
+                            .addGap(84, 84, 84)
+                            .addComponent(jLabel2)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(55, 55, 55)
-                        .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(31, 31, 31)
-                        .addComponent(cbBicicletas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnRegistar)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnListar))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(121, 121, 121)
+                        .addComponent(jLabel3)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 261, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(186, 186, 186)
+                        .addGap(164, 164, 164)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cbBicicletas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(94, 94, 94)
+                        .addGap(72, 72, 72)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(96, 96, 96)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -138,22 +225,25 @@ public class TelaManutencao extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistarActionPerformed
-  try {
+ try {
         Manutencao m = new Manutencao();
         m.setDescricao(txtDescricao.getText());
 
-        // Converte a data digitada (String) em um objeto java.util.Date
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy"); // mesmo formato do campo
+        // Pegar bicicleta selecionada pelo índice (você já mantém a lista 'bicicletas')
+        int idx = cbBicicletas.getSelectedIndex();
+        if (idx < 0 || idx >= bicicletas.size()) {
+            JOptionPane.showMessageDialog(this, "Selecione uma bicicleta antes de registrar.");
+            return;
+        }
+        Bicicleta bicicletaSelecionada = bicicletas.get(idx);
+        m.setBicicletaId(bicicletaSelecionada.getId());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date data = sdf.parse(txtData.getText());
         m.setData(data);
-
         ManutencaoDAO dao = new ManutencaoDAO();
         dao.create(m);
-
         ListarManutencao();
-
         JOptionPane.showMessageDialog(null, "Manutenção registrada com sucesso!");
-
     } catch (ParseException e) {
         JOptionPane.showMessageDialog(null, "Data inválida! Use o formato dd/MM/yyyy.");
     } catch (Exception e) {
@@ -166,6 +256,19 @@ public class TelaManutencao extends javax.swing.JFrame {
         // TODO add your handling code here:
         ListarManutencao();
     }//GEN-LAST:event_btnListarActionPerformed
+
+    private void tabelaManutencaoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabelaManutencaoMouseClicked
+        // TODO add your handling code here:
+int row = tabelaManutencao.getSelectedRow();
+    if (row != -1) {
+        Object bicObj = tabelaManutencao.getValueAt(row, 1);
+        cbBicicletas.setSelectedItem(bicObj != null ? bicObj.toString() : "");
+        Object dataObj = tabelaManutencao.getValueAt(row, 2);
+        txtData.setText(dataObj != null ? dataObj.toString() : "");
+        Object descObj = tabelaManutencao.getValueAt(row, 3);
+        txtDescricao.setText(descObj != null ? descObj.toString() : "");
+    }
+    }//GEN-LAST:event_tabelaManutencaoMouseClicked
 
     /**
      * @param args the command line arguments
@@ -196,6 +299,9 @@ public class TelaManutencao extends javax.swing.JFrame {
     private javax.swing.JButton btnListar;
     private javax.swing.JButton btnRegistar;
     private javax.swing.JComboBox<String> cbBicicletas;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tabelaManutencao;
