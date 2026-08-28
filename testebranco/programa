@@ -1,0 +1,39 @@
+1  → System.out.print("Digite a sua nota: ");
+
+2  → if (leia.hasNextDouble())
+
+3  → nota1 = leia.nextDouble();
+
+4  → nota1 < 0 ?
+
+5  → nota1 > 10 ?
+
+6  → System.out.print("A nota deve ser entre 0 e 10: ");
+
+7  → nota1 = leia.nextDouble();
+
+8  → System.out.print("Digite a sua nota: ");
+
+9  → if (leia.hasNextDouble())
+
+10 → nota2 = leia.nextDouble();
+
+11 → nota2 < 0 ?
+
+12 → nota2 > 10 ?
+
+13 → System.out.print("A nota deve ser entre 0 e 10: ");
+
+14 → nota2 = leia.nextDouble();
+
+15 → media = (nota1 + nota2) / 2;
+
+16 → media <= 3 ?
+
+17 → System.out.print("Reprovado");
+
+18 → media <= 6 ?
+
+19 → System.out.print("Recuperação");
+
+20 → System.out.print("Aprovado");
